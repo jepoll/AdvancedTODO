@@ -1,37 +1,40 @@
-// src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../src/types';
+import { RootStackParamList, User } from '../src/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage/lib/typescript/AsyncStorage';
-import { User } from '../src/types';
-
+import { Text, TextInput, Button } from 'react-native-paper';
+import { CommonActions } from '@react-navigation/native';
+import { login } from '../src/redux/slices/userSlice';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 interface MockUsers {
-    [email: string] : Omit<User, 'jwt'>
+  [email: string]: Omit<User, 'jwt'>;
 }
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const dispatch = useDispatch();
+
   const mockUsers: MockUsers = {
-    'user@example.com': { email: 'user@example.com', username: 'user1', password: 'user', role: 'user' },
-    'admin@example.com': { email: 'admin@example.com', username: 'admin1', password: 'admin', role: 'admin' },
+    'user@mock.com': { email: 'user@mock.com', username: 'user1', password: 'user', role: 'user' },
+    'admin@mock.com': { email: 'admin@mock.com', username: 'admin1', password: 'admin', role: 'admin' },
   };
 
   const handleLogin = async () => {
-
     const user = mockUsers[email];
-
     if (user && user.password === password) {
-      await AsyncStorage.setItem('userRole', user.role);
-      await AsyncStorage.setItem('username', user.username);
+      dispatch(login({ email: user.email, username: user.username, role: user.role }));
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        })
+      );
     } else {
       Alert.alert('Invalid credentials');
     }
@@ -39,32 +42,28 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={{
-        color: '#fff',
-        fontSize: 28,
-        fontWeight: 'bold',
-        paddingBottom: 30,
-        alignSelf: 'center',
-      }}>Log In</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Your Email"
-        placeholderTextColor='gray'
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor='gray'
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={ styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+  <Text style={styles.title}>Log In</Text>
+  <TextInput
+    label={email === '' ? 'Enter Your Email' : ''}
+    mode="outlined"
+    style={styles.input}
+    value={email}
+    onChangeText={setEmail}
+    theme={{ colors: { text: 'black' } }}
+  />
+  <TextInput
+    label={password === '' ? 'Password' : ''}
+    mode="outlined"
+    style={styles.input}
+    value={password}
+    onChangeText={setPassword}
+    secureTextEntry
+    theme={{ colors: { text: 'black' } }}
+  />
+  <Button mode="contained" onPress={handleLogin} style={styles.button}>
+    Log In
+  </Button>
+</SafeAreaView>
   );
 };
 
@@ -75,28 +74,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  title: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: 'bold',
+    paddingBottom: 30,
+    alignSelf: 'center',
+  },
   input: {
-    height: 50,
-    color: 'black',
-    borderColor: 'gray',
-    borderRadius: 10,
-    borderWidth: 1,
-    backgroundColor: '#fff',
     marginBottom: 20,
-    padding: 10,
   },
   button: {
-    borderRadius: 10,
-    backgroundColor: '#119bff',
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 18,
   },
 });
 
