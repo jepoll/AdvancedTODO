@@ -1,89 +1,89 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/store';
-import { StyleSheet } from 'react-native';
 
-
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator, DrawerScreenProps } from '@react-navigation/drawer';
-import { Appbar, FAB } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 import { format } from 'date-fns';
 
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
 
 import LoginScreen from './screens/LoginScreen';
 import ListScreen from './screens/ListScreen';
 import ProfileScreen from './screens/ProfileScreen';
-import { DrawerParamList, ProfileScreenPropsStack, RootStackParamList } from './src/types';
+import { RootStackParamList } from './src/types';
 import { PaperProvider } from 'react-native-paper';
+import { theme } from './src/theme';
+import CreateEditTaskScreen from './screens/CreateEditTaskScreen';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const Drawer = createDrawerNavigator<DrawerParamList>();
 
 
 const CustomHeader = () => {
   const currentDate = format(new Date(), 'yyyy-MM-dd');
-  
+
   return (
-    <Appbar.Header style={{ backgroundColor: '#19196f' }}>
-      <Appbar.Content title="To-Do." titleStyle={{ color: '#fff', fontSize: 24, fontWeight: 'bold'}} />
-      <Text style={{ color: '#fff', marginRight: 10, fontWeight: 'bold' }}>{currentDate}</Text>
+    <Appbar.Header style={{ backgroundColor: theme.colors.primary }}>
+      <Appbar.Content title="To-Do" titleStyle={{ color: theme.colors.text, fontSize: 24, fontWeight: 'bold' }} />
+      <Text style={{ color: theme.colors.text, marginRight: 10, fontWeight: 'bold' }}>{currentDate}</Text>
     </Appbar.Header>
   );
 };
 
-const DrawerNavigator: React.FC<ProfileScreenPropsStack> = ({ navigation }) => {
-  return (
-    <Drawer.Navigator initialRouteName='List'>
-    <Drawer.Screen
-      name="List"
-      component={ListScreen}
-      options={{
-        header: () => <CustomHeader />,
-        drawerLabel: () => null
-      }}
-    />
-    <Drawer.Screen 
-        name="Profile" 
-        component={ProfileScreen} 
-        options={{headerShown: false}} 
-      />  </Drawer.Navigator>
-    );
-};
+// Define the type for the BackButton props
+type BackButtonProps = { onPress: () => void}; 
+
+// Custom back button component
+const BackButton: React.FC<BackButtonProps> = ({ onPress }) => (
+  <TouchableOpacity onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+    <Text style={{ color: '#fff', fontWeight: 'bold' }}>{'<'} BACK</Text>
+  </TouchableOpacity>
+);
 
 
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
         <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-          {/* <Stack.Screen
-            name="List"
-            component={DrawerNavigator}
-            options={{headerShown:false}}
-          /> */}
-        </Stack.Navigator>
+          <Stack.Navigator initialRouteName="Login">
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="List"
+              component={ListScreen}
+              options={{ header: CustomHeader }}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={ProfileScreen}
+              options={({ navigation }) => ({
+                headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+                headerStyle: { backgroundColor: 'transparent', elevation: 0 },
+                headerTitle: '',
+                headerShadowVisible: false,
+                headerTransparent: true,
+                headerTintColor: '#fff',
+              })}
+            />
+            <Stack.Screen name="CreateEditTask" component={CreateEditTaskScreen} options={({ navigation }) => ({
+                headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+                headerStyle: { backgroundColor: 'transparent', elevation: 0 },
+                headerTitle: '',
+                headerShadowVisible: false,
+                headerTransparent: true,
+                headerTintColor: '#fff',
+              })} />
+          </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
     </Provider>
   );
 };
 
-const styles = StyleSheet.create({
-  fabContainer: {
-    flex: 1,
-    justifyContent: 'flex-end', // Расположить кнопку внизу
-    alignItems: 'flex-end', // Расположить кнопку справа
-    margin: 16, // Отступы от краев
-  },
-  fab: {
-    backgroundColor: '#6200ee', // Цвет кнопки
-  },
-});
-
 export default App;
-

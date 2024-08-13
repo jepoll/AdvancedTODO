@@ -4,9 +4,10 @@ import { useDispatch } from 'react-redux';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, User } from '../src/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, TextInput, Button } from 'react-native-paper';
+import { Text, TextInput, Button, useTheme } from 'react-native-paper';
 import { CommonActions } from '@react-navigation/native';
 import { login } from '../src/redux/slices/userSlice';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -17,6 +18,7 @@ interface MockUsers {
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
 
   const dispatch = useDispatch();
 
@@ -32,7 +34,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: 'Home' }],
+          routes: [{ name: 'List' }],
         })
       );
     } else {
@@ -83,9 +85,17 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 20,
   },
   button: {
-    marginTop: 20,
+    backgroundColor: '#00a2ff',
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  buttonText: { 
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

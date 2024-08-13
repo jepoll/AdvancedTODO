@@ -5,6 +5,7 @@ interface UserState {
   username: string;
   role: string;
   isLoggedIn: boolean;
+  temperatureUnit: 'Celsius' | 'Fahrenheit';
 }
 
 const initialState: UserState = {
@@ -12,6 +13,7 @@ const initialState: UserState = {
   username: '',
   role: '',
   isLoggedIn: false,
+  temperatureUnit: 'Celsius',
 };
 
 const userSlice = createSlice({
@@ -30,8 +32,11 @@ const userSlice = createSlice({
       state.role = '';
       state.isLoggedIn = false;
     },
+    setTemperatureUnit: (state, action: PayloadAction<'Celsius' | 'Fahrenheit'>) => {
+      state.temperatureUnit = action.payload;
+    },
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, setTemperatureUnit } = userSlice.actions;
 export default userSlice.reducer;
