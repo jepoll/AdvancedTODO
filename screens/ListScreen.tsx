@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
     left: 16,
     bottom: 16,
     backgroundColor: '#fff',
+    borderRadius: 50,
   },
   addFab: {
     position: 'absolute',

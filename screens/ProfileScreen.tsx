@@ -5,21 +5,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, TextInput } from 'react-native-paper';
 import { RootState } from '../src/redux/store';
 import { logout } from '../src/redux/slices/userSlice';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../src/types';
+import { ProfileScreenPropsDrawer } from '../src/types';
 
-type ProfileScreenProps = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+const ProfileScreen: React.FC<ProfileScreenPropsDrawer> = ({ navigation }) => {
   const { email, username, role } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(logout());
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    const rootNavigation = navigation.getParent();
+    if (rootNavigation) {
+      rootNavigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
+
   };
 
   return (
